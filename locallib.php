@@ -35,6 +35,8 @@ require_once($CFG->libdir . '/filelib.php');
 
 class evaluacionpares{
 
+    const NO_ASPECTOS = 4;
+
     public $dbrecord;
 
     public $fase;
