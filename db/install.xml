@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/evaluacionpares/db" VERSION="20201009" COMMENT="XMLDB file for Moodle mod_evaluacionpares"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+    <TABLES>
+        <TABLE NAME="evaluacionpares" COMMENT="Stores the evaluacionpares activity module instances.">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="fase" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false" COMMENT="fase en la que se encuentra el evaluacionpares"/>
+                <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The name of the activity module instance"/>
+                <FIELD NAME="intro" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Descripcion general"/>
+                <FIELD NAME="introformat" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The format of the intro field"/>
+                <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"/>
+                <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="calif_envio" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="calificacion que recibe un estudiante por el envio"/>
+                <FIELD NAME="calif_aprobatoria" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="calificacion necesaria para aprobar el envio"/>
+                <FIELD NAME="calif_valoracion" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="porcentaje de la calificacion que tendra la valoracion de los demas estudiantes"/>
+                <FIELD NAME="calif_aprob_valoracion" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="calificacion aprobatoria de la valoracion"/>
+                <FIELD NAME="no_decimales" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false" COMMENT="numero de decimales en la calificacion"/>
+                <FIELD NAME="no_archivos" TYPE="int" LENGTH="3" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="numero maximo de archivos anexos que puede subir el alumno"/>
+                <FIELD NAME="tipo_arch" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="extenciones de los arvhivos permitidos"/>
+                <FIELD NAME="tam_max" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="100000" SEQUENCE="false" COMMENT="Maximum size of the one attached file"/>
+                <FIELD NAME="instruccion_envio" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Intrucciones para el envio"/>
+                <FIELD NAME="instruccion_envioformat" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The format of the intro field"/>
+                <FIELD NAME="instruccion_valoracion" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Intrucciones para la valoracion"/>
+                <FIELD NAME="instruccion_valoracionformat" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The format of the intro field"/>
+                <FIELD NAME="no_revisiones" TYPE="int" LENGTH="3" NOTNULL="false" SEQUENCE="false" COMMENT="Numero de revisiones"/>
+                <FIELD NAME="retro_conclusion" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Texto para la retro"/>
+                <FIELD NAME="retro_conclusionformat" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The format of the intro field"/>
+                <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Llave foranea referente al curso"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="fk_course" TYPE="foreign" FIELDS="course" REFTABLE="course" REFFIELDS="id"/>
+            </KEYS>
+        </TABLE>
+
+        <TABLE NAME="entrega" COMMENT="Entrega de tarea de los alumnos">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="titulo" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="titulo del archivo entregado"/>
+                <FIELD NAME="envios" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="numero de archivos"/>
+                <FIELD NAME="calificacion" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="Calificacion total de la entrega"/>        
+                <FIELD NAME="no_calificaciones" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Numero de calificaciones recibidas"/>        
+                <FIELD NAME="evaluacionpares_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Llave foranea referente al evaluacionpares"/>        
+                <FIELD NAME="autor_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Llave foranea referente al usuario"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="fk_evaluacionpares" TYPE="foreign" FIELDS="evaluacionpares_id" REFTABLE="evaluacionpares" REFFIELDS="id"/>
+                <KEY NAME="fk_user" TYPE="foreign" FIELDS="autor_id" REFTABLE="user" REFFIELDS="id"/>
+            </KEYS>
+        </TABLE>
+
+        <TABLE NAME="criterios_evaluacion" COMMENT="Listado de los criterios de evaluacion">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="criterio" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Criterio de evaluacion"/>
+                <FIELD NAME="criterioformat" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The format of the intro field"/>
+                <FIELD NAME="evaluacionpares_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente al modulo"/>        
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="fk_evaluacionpares" TYPE="foreign" FIELDS="evaluacionpares_id" REFTABLE="evaluacionpares" REFFIELDS="id"/>
+            </KEYS>
+        </TABLE>
+
+        <TABLE NAME="opciones_criterio" COMMENT="Listado de las posibles opciones de criterio">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="definicion" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Descripcion de la opcion"/>
+                <FIELD NAME="calificacion" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="5" COMMENT="puntuaje de la opcion"/>
+                <FIELD NAME="criterios_evaluacion_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente al modulo"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="fk_criterios_evaluacion" TYPE="foreign" FIELDS="criterios_evaluacion_id" REFTABLE="criterios_evaluacion" REFFIELDS="id"/>
+            </KEYS>
+        </TABLE>
+
+        <TABLE NAME="calificacion_usuario" COMMENT="Stores the evaluacionpares activity module instances.">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="calificacion" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="5" COMMENT="The format of the intro field."/>
+                <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="estatus de la calificacion para ver si se toma en cuenta o no"/>        
+                <FIELD NAME="edit_user_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="si un profesor altera la calificacion aquí se mostrara"/>
+                <FIELD NAME="entrega_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente a la entrega"/>
+                <FIELD NAME="user_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente al usuario"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="fk_user" TYPE="foreign" FIELDS="user_id" REFTABLE="user" REFFIELDS="id"/>
+                <KEY NAME="fk_entrega" TYPE="foreign" FIELDS="entrega_id" REFTABLE="entrega" REFFIELDS="id"/>
+            </KEYS>
+        </TABLE>
+
+        <TABLE NAME="respuestas_rubrica" COMMENT="Stores the evaluacionpares activity module instances.">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="opciones_criterio_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente a opciones criterio"/>
+                <FIELD NAME="calificacion_usuario_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente al calificacion usuario"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="fk_opciones" TYPE="foreign" FIELDS="opciones_criterio_id" REFTABLE="opciones_criterio" REFFIELDS="id"/>
+                <KEY NAME="fk_calificaciones" TYPE="foreign" FIELDS="calificacion_usuario_id" REFTABLE="calificacion_usuario" REFFIELDS="id"/>
+            </KEYS>
+        </TABLE>
+
+    </TABLES>
+</XMLDB>
