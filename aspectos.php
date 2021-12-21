@@ -49,7 +49,7 @@ if ($cmid) {
     $cm             = get_coursemodule_from_instance('evaluacionpares', $moduleinstance->id, $course->id, false, MUST_EXIST);
 }
 
-$evaluacionpares_id = $cm->instance;
+$evaluacionpares =  new evaluacionpares($moduleinstance, $cm, $course);
 
 require_login($course, false, $cm);
 
@@ -60,7 +60,7 @@ $PAGE->set_title(get_string('pluginname', 'mod_evaluacionpares'));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
-$data = $DB->get_records_sql("SELECT * FROM {criterios_evaluacion} WHERE evaluacionpares_id = $evaluacionpares_id;");
+$data = $DB->get_records_sql("SELECT * FROM {criterios_evaluacion} WHERE evaluacionpares_id = $evaluacionpares->id;");
 
 
 if($noAspectos){
@@ -80,7 +80,7 @@ if ($mform->is_cancelled()) {
     redirect(new moodle_url('/mod/evaluacionpares/view.php', array('id' => $cm->id)));
 
 } else if ($fromform = $mform->get_data()) {
-    $criterio = new stdClass();
+    $criterio       = new stdClass();
     $opcionCriterio = new stdClass();
 
     for($i = 1; $i <= count($data); $i++){
@@ -90,41 +90,72 @@ if ($mform->is_cancelled()) {
         $criterio->id                 = $fromform->$descripcionid;
         $criterio->criterio           = $descripcion['text'];
         $criterio->criterioformat     = $descripcion['format'];
-        $criterio->evaluacionpares_id = $evaluacionpares_id; 
-        $DB->update_record('criterios_evaluacion', $criterio, $bulk=false);
+        $criterio->evaluacionpares_id = $evaluacionpares->id; 
+        //$DB->update_record('criterios_evaluacion', $criterio, $bulk=false);
         
         for($j = 1; $j <= 4; $j++){
             $definicion                              = "calif_def$i$j";
             $calificacion                            = "calif_envio$i$j";
             $opcionid                                = "opcionid$i$j";
-            $opcionCriterio->id                      = $fromform->$opcionid;
-            $opcionCriterio->definicion              = $fromform->$definicion;
-            $opcionCriterio->calificacion            = $fromform->$calificacion;
-            $opcionCriterio->criterios_evaluacion_id = $criterio->id;
-            $DB->update_record('opciones_criterio', $opcionCriterio, $bulk=false);
+            
+            if(strlen($fromform->$opcionid) != 0){
+            
+                $opcionCriterio->id                      = $fromform->$opcionid;
+                $opcionCriterio->definicion              = $fromform->$definicion;
+                $opcionCriterio->calificacion            = $fromform->$calificacion;
+                $opcionCriterio->criterios_evaluacion_id = $criterio->id;
+                $DB->update_record('opciones_criterio', $opcionCriterio, $bulk=false);
+            
+            }else{
+            
+                if(strlen($fromform->$definicion) != 0){
+                    
+                    $opcionCriterio->definicion              = $fromform->$definicion;
+                    $opcionCriterio->calificacion            = $fromform->$calificacion;
+                    $opcionCriterio->criterios_evaluacion_id = $criterio->id;
+
+                    $DB->insert_record('opciones_criterio', $opcionCriterio);
+
+                }
+
+            }
         }
     }
     
     if($noAspectos-2 != count($data)){
     
         for($i = count($data)+1; $i <= $noAspectos-2; $i++){
-            $des                          = "descripcion$i";
-            $descripcion                  = $fromform->$des;
-            $criterio->criterio           = $descripcion['text'];
-            $criterio->criterioformat     = $descripcion['format'];
-            $criterio->evaluacionpares_id = $evaluacionpares_id;
-            $idCriterio                   = $DB->insert_record('criterios_evaluacion', $criterio);
+
+            $des         = "descripcion$i";
+            $descripcion = $fromform->$des;
             
-            for($j = 1; $j <= 4; $j++){
-                $definicion                              = "calif_def$i$j";
-                $calificacion                            = "calif_envio$i$j";
-                $opcionCriterio->definicion              = $fromform->$definicion;
-                $opcionCriterio->calificacion            = $fromform->$calificacion;
-                $opcionCriterio->criterios_evaluacion_id = $idCriterio;
+            if(strlen($descripcion['text']) != 0){
+                
+                $criterio->criterio           = $descripcion['text'];
+                $criterio->criterioformat     = $descripcion['format'];
+                $criterio->evaluacionpares_id = $evaluacionpares->id;
+                $idCriterio                   = $DB->insert_record('criterios_evaluacion', $criterio);
+                
+                for($j = 1; $j <= 4; $j++){
+
+                    $definicion = "calif_def$i$j";
+                    
+                    if(strlen($fromform->$definicion) != 0){
+                        $calificacion                            = "calif_envio$i$j";
+                        $opcionCriterio->definicion              = $fromform->$definicion;
+                        $opcionCriterio->calificacion            = $fromform->$calificacion;
+                        $opcionCriterio->criterios_evaluacion_id = $idCriterio;
+
+                        $DB->insert_record('opciones_criterio', $opcionCriterio);
+
+                    }
     
-                $DB->insert_record('opciones_criterio', $opcionCriterio);
+                }
+
             }
+
         }
+
     }
     
     redirect(new moodle_url('/mod/evaluacionpares/view.php', array('id' => $cm->id)),"Actualizacion exitosa");
