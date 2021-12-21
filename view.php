@@ -91,7 +91,7 @@ if($moduleinstance->fase == 0){
                 $criterio->criterio           = $descripcion['text'];
                 $criterio->criterioformat     = $descripcion['format'];
                 $criterio->evaluacionpares_id = $evaluacionpares->id;
-                $idCriterio                   = $DB->insert_record('criterios_evaluacion', $criterio);
+                $idCriterio                   = $DB->insert_record('criterio_evaluacion', $criterio);
                 
                 for($j = 1; $j <= 4; $j++){
 
@@ -101,9 +101,9 @@ if($moduleinstance->fase == 0){
                         $calificacion                            = "calif_envio$i$j";
                         $opcionCriterio->definicion              = $fromform->$definicion;
                         $opcionCriterio->calificacion            = $fromform->$calificacion;
-                        $opcionCriterio->criterios_evaluacion_id = $idCriterio;
+                        $opcionCriterio->criterio_evaluacion_id = $idCriterio;
 
-                        $DB->insert_record('opciones_criterio', $opcionCriterio);
+                        $DB->insert_record('opcion_criterio', $opcionCriterio);
 
                     }
     

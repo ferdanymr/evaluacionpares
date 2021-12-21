@@ -53,7 +53,7 @@
             </KEYS>
         </TABLE>
 
-        <TABLE NAME="criterios_evaluacion" COMMENT="Listado de los criterios de evaluacion">
+        <TABLE NAME="criterio_evaluacion" COMMENT="Listado de los criterios de evaluacion">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="criterio" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Criterio de evaluacion"/>
@@ -66,16 +66,16 @@
             </KEYS>
         </TABLE>
 
-        <TABLE NAME="opciones_criterio" COMMENT="Listado de las posibles opciones de criterio">
+        <TABLE NAME="opcion_criterio" COMMENT="Listado de las posibles opciones de criterio">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="definicion" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Descripcion de la opcion"/>
                 <FIELD NAME="calificacion" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="5" COMMENT="puntuaje de la opcion"/>
-                <FIELD NAME="criterios_evaluacion_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente al modulo"/>
+                <FIELD NAME="criterio_evaluacion_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente al modulo"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-                <KEY NAME="fk_criterios_evaluacion" TYPE="foreign" FIELDS="criterios_evaluacion_id" REFTABLE="criterios_evaluacion" REFFIELDS="id"/>
+                <KEY NAME="fk_criterio_evaluacion" TYPE="foreign" FIELDS="criterio_evaluacion_id" REFTABLE="criterio_evaluacion" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
 
@@ -95,15 +95,15 @@
             </KEYS>
         </TABLE>
 
-        <TABLE NAME="respuestas_rubrica" COMMENT="Stores the evaluacionpares activity module instances.">
+        <TABLE NAME="respuesta_rubrica" COMMENT="Stores the evaluacionpares activity module instances.">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-                <FIELD NAME="opciones_criterio_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente a opciones criterio"/>
+                <FIELD NAME="opcion_criterio_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente a opciones criterio"/>
                 <FIELD NAME="calificacion_usuario_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente al calificacion usuario"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-                <KEY NAME="fk_opciones" TYPE="foreign" FIELDS="opciones_criterio_id" REFTABLE="opciones_criterio" REFFIELDS="id"/>
+                <KEY NAME="fk_opciones" TYPE="foreign" FIELDS="opcion_criterio_id" REFTABLE="opcion_criterio" REFFIELDS="id"/>
                 <KEY NAME="fk_calificaciones" TYPE="foreign" FIELDS="calificacion_usuario_id" REFTABLE="calificacion_usuario" REFFIELDS="id"/>
             </KEYS>
         </TABLE>

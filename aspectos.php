@@ -60,7 +60,7 @@ $PAGE->set_title(get_string('pluginname', 'mod_evaluacionpares'));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
-$data = $DB->get_records_sql("SELECT * FROM {criterios_evaluacion} WHERE evaluacionpares_id = $evaluacionpares->id;");
+$data = $DB->get_records_sql("SELECT * FROM {criterio_evaluacion} WHERE evaluacionpares_id = $evaluacionpares->id;");
 
 
 if($noAspectos){
@@ -91,7 +91,7 @@ if ($mform->is_cancelled()) {
         $criterio->criterio           = $descripcion['text'];
         $criterio->criterioformat     = $descripcion['format'];
         $criterio->evaluacionpares_id = $evaluacionpares->id; 
-        //$DB->update_record('criterios_evaluacion', $criterio, $bulk=false);
+        $DB->update_record('criterio_evaluacion', $criterio, $bulk=false);
         
         for($j = 1; $j <= 4; $j++){
             $definicion                              = "calif_def$i$j";
@@ -103,8 +103,8 @@ if ($mform->is_cancelled()) {
                 $opcionCriterio->id                      = $fromform->$opcionid;
                 $opcionCriterio->definicion              = $fromform->$definicion;
                 $opcionCriterio->calificacion            = $fromform->$calificacion;
-                $opcionCriterio->criterios_evaluacion_id = $criterio->id;
-                $DB->update_record('opciones_criterio', $opcionCriterio, $bulk=false);
+                $opcionCriterio->criterio_evaluacion_id = $criterio->id;
+                $DB->update_record('opcion_criterio', $opcionCriterio, $bulk=false);
             
             }else{
             
@@ -112,9 +112,9 @@ if ($mform->is_cancelled()) {
                     
                     $opcionCriterio->definicion              = $fromform->$definicion;
                     $opcionCriterio->calificacion            = $fromform->$calificacion;
-                    $opcionCriterio->criterios_evaluacion_id = $criterio->id;
+                    $opcionCriterio->criterio_evaluacion_id = $criterio->id;
 
-                    $DB->insert_record('opciones_criterio', $opcionCriterio);
+                    $DB->insert_record('opcion_criterio', $opcionCriterio);
 
                 }
 
@@ -134,7 +134,7 @@ if ($mform->is_cancelled()) {
                 $criterio->criterio           = $descripcion['text'];
                 $criterio->criterioformat     = $descripcion['format'];
                 $criterio->evaluacionpares_id = $evaluacionpares->id;
-                $idCriterio                   = $DB->insert_record('criterios_evaluacion', $criterio);
+                $idCriterio                   = $DB->insert_record('criterio_evaluacion', $criterio);
                 
                 for($j = 1; $j <= 4; $j++){
 
@@ -144,9 +144,9 @@ if ($mform->is_cancelled()) {
                         $calificacion                            = "calif_envio$i$j";
                         $opcionCriterio->definicion              = $fromform->$definicion;
                         $opcionCriterio->calificacion            = $fromform->$calificacion;
-                        $opcionCriterio->criterios_evaluacion_id = $idCriterio;
+                        $opcionCriterio->criterio_evaluacion_id = $idCriterio;
 
-                        $DB->insert_record('opciones_criterio', $opcionCriterio);
+                        $DB->insert_record('opcion_criterio', $opcionCriterio);
 
                     }
     
@@ -170,7 +170,7 @@ if ($mform->is_cancelled()) {
         $toform->$descripcion['text']   = $criterio->criterio;
         $toform->$descripcion['format'] = $criterio->criterioformat;
         
-        $data2 = $DB->get_records_sql("SELECT * FROM {opciones_criterio} WHERE criterios_evaluacion_id = $criterio->id;");
+        $data2 = $DB->get_records_sql("SELECT * FROM {opcion_criterio} WHERE criterio_evaluacion_id = $criterio->id;");
         $j     = 1;
         
         foreach($data2 as $opcion){
