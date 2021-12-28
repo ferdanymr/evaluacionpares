@@ -28,7 +28,7 @@ require_once('localview/aspectos_form.php');
 
 // Course_module ID, or
 $id = optional_param('id', 0, PARAM_INT);
-$envio = optional_param('env', 0, PARAM_INT);
+$envio->id = optional_param('env', 0, PARAM_INT);
 
 // ... module instance id.
 $e  = optional_param('e', 0, PARAM_INT);
@@ -50,10 +50,6 @@ require_login($course, true, $cm);
 $modulecontext = context_module::instance($cm->id);
 
 $evaluacionpares =  new evaluacionpares($moduleinstance, $cm, $course);
-
-var_dump($moduleinstance);
-echo '<br><h2>CM</h2>';
-var_dump($cm);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //bloque para configurar la vista de criterios en dado caso de que la fase dea 0               //
@@ -119,6 +115,15 @@ if($moduleinstance->fase == 0){
     
     }
     
+}else{
+    if(!$envio->id){
+        $data = $evaluacionpares->get_envio_by_userId($USER->id);
+        $envio = $data[1];
+        if (empty($envio->id)) {
+            $envio = new stdClass;
+            $envio->id = null;
+        }
+    }
 }
 
 $PAGE->set_url(new moodle_url('/mod/evaluacionpares/view.php', array('id' => $cm->id)));
@@ -135,30 +140,16 @@ if($moduleinstance->fase == 0){
     $mform->display();
 
 }else{
-    require_once('localview/main_form.php');
-    //$out = array();
-    //    
-    //$fs = get_file_storage();
-    //$files = $fs->get_area_files($modulecontext->id, 'mod_evaluacionpares', 'submission_attachment', '2');
-    //foreach ($files as $file) {
-    //    $filepath   = $file->get_filepath();
-    //    $filename   = $file->get_filename();
-    //    $fileurl    = moodle_url::make_pluginfile_url($modulecontext->id, 'mod_evaluacionpares', 'submission_attachment',
-    //                    '2', $filepath, $filename, true);
-    //    $embedurl   = moodle_url::make_pluginfile_url($modulecontext->id, 'mod_evaluacionpares', 'submission_attachment',
-    //                    '2', $filepath, $filename, false);
-    //    $embedurl   = new moodle_url($embedurl, array('preview' => 'bigthumb'));
-    //    $type       = $file->get_mimetype();
-    //    
-    //    $linkhtml   = html_writer::link($fileurl, $image . substr($filepath, 1) . $filename);
-    //    $linktxt    = "$filename [$fileurl]";
-    //    var_dump($linkhtml);
-    //    echo '<br>';
-    //    var_dump($linktxt);
-    //}
+    print_collapsible_region_start('','instrucciones-envio',get_string('param_inst','mod_evaluacionpares'));
+    echo '<div class="row">';
+    echo '	<div class="col-12">';
+    echo "      <p>$moduleinstance->instruccion_envio</p>";
+    echo '	</div>';
+    echo '</div>';
+    print_collapsible_region_end();
     
-    if($envio){
-        $url = new moodle_url('/mod/evaluacionpares/envio.php', array('id' => $cm->id, 'env' => $envio));
+    if($envio->id){
+        $url = new moodle_url('/mod/evaluacionpares/envio.php', array('id' => $cm->id, 'env' => $envio->id));
         echo '<a class="btn btn-primary" href="'. $url.'">Editar Envio</a>';
     }else{
         $url = new moodle_url('/mod/evaluacionpares/envio.php', array('id' => $cm->id));

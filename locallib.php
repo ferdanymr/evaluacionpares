@@ -117,6 +117,11 @@ class evaluacionpares{
         return $DB->get_records_sql("SELECT * FROM {entrega} WHERE evaluacionpares_id = $this->id AND autor_id = $userId;");
     }
 
+    public function get_archivos_by_content_hash($hash, $userid){
+        global $DB;
+        return $DB->get_records_sql("SELECT * FROM {files} WHERE contenthash = '$hash' AND userid = $userid ORDER BY id DESC LIMIT 1;");
+    }
+
     /**
      * Return the editor options for the submission content field.
      *

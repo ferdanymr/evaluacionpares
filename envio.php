@@ -52,62 +52,48 @@ $modulecontext = context_module::instance($cm->id);
 
 $evaluacionpares =  new evaluacionpares($moduleinstance, $cm, $course);
 
-//$envio = file_prepare_standard_editor($envio, 'content', $evaluacionpares->envio_content_options(),
-    //    $evaluacionpares->context, 'mod_evaluacionpares', 'submission_content', $envio->id);
-//
-    //$envio = file_prepare_standard_filemanager($envio, 'attachment', $evaluacionpares->envio_archivo_options(),
-    //    $evaluacionpares->context, 'mod_evaluacionpares', 'submission_attachment', $envio->id);
+if(!$envio->id || $edit){
+    $mform = new envio_form(new moodle_url('/mod/evaluacionpares/envio.php', 
+        array('id' => $id)), array('attachmentopts' => $evaluacionpares->envio_archivo_options()));
 
+    if ($mform->is_cancelled()) {
 
+        redirect(new moodle_url('/mod/evaluacionpares/view.php', array('id' => $cm->id)));
 
-    //$mform = new envio_form(new moodle_url('/mod/evaluacionpares/view.php', array('id' => $id)), array('current' => $submission, 'evaluacionpares' => $evaluacionpares,
-    //    'contentopts' => $evaluacionpares->envio_content_options(), 'attachmentopts' => $evaluacionpares->envio_archivo_options()));
+    }else if ($envio = $mform->get_data()) {
+        $envio->envios = '1';
+        $envio->calificacion = '0';
+        $envio->no_calificaciones = '0';
+        $envio->evaluacionpares_id = $evaluacionpares->id;
+        $envio->autor_id = $USER->id;
 
-$mform = new envio_form(new moodle_url('/mod/evaluacionpares/envio.php', 
-    array('id' => $id)), array('attachmentopts' => $evaluacionpares->envio_archivo_options()));
+        $envio->id = $DB->insert_record('entrega', $envio);
 
-if ($mform->is_cancelled()) {
-    
-    redirect(new moodle_url('/mod/evaluacionpares/view.php', array('id' => $cm->id)));
+        file_save_draft_area_files($envio->attachment_filemanager, $modulecontext->id, 'mod_evaluacionpares', 'submission_attachment',
+            $envio->id, $evaluacionpares->envio_archivo_options());
 
-}else if ($envio = $mform->get_data()) {
-    $envio->envios = '1';
-    $envio->calificacion = '0';
-    $envio->no_calificaciones = '0';
-    $envio->evaluacionpares_id = $evaluacionpares->id;
-    $envio->autor_id = $USER->id;
+        redirect(new moodle_url('/mod/evaluacionpares/view.php', array('id' => $cm->id, 'env' => $envio->id)));
 
-    $envio->id = $DB->insert_record('entrega', $envio);
+    }else {
 
-    file_save_draft_area_files($envio->attachment_filemanager, $modulecontext->id, 'mod_evaluacionpares', 'submission_attachment',
-        $envio->id, $evaluacionpares->envio_archivo_options());
-            
-    redirect(new moodle_url('/mod/evaluacionpares/view.php', array('id' => $cm->id, 'env' => $envio->id)));
-    //$envio = file_postupdate_standard_editor($envio, 'content', $evaluacionpares->envio_content_options(),
-    //    $evaluacionpares->context, 'mod_evaluacionpares', 'submission_content', $envio->id);
-    //
-    //$envio = file_postupdate_standard_filemanager($envio, 'attachment', $evaluacionpares->envio_archivo_options(),
-    //    $evaluacionpares->context, 'mod_evaluacionpares', 'submission_attachment', $envio->id);
-}else {
-    
-    if(!$envio->id){
-        $data = $evaluacionpares->get_envio_by_userId($USER->id);
-        $envio = $data[1];
-        if (empty($envio->id)) {
-            $envio = new stdClass;
-            $envio->id = null;
+        if(!$envio->id){
+            $data = $evaluacionpares->get_envio_by_userId($USER->id);
+            $envio = $data[1];
+            if (empty($envio->id)) {
+                $envio = new stdClass;
+                $envio->id = null;
+            }
         }
-    }
-    var_dump($envio);
 
-    $draftitemid = file_get_submitted_draft_itemid('attachment_filemanager');
-    
-    file_prepare_draft_area($draftitemid, $modulecontext->id, 'mod_evaluacionpares', 'submission_attachment', $envio->id,
-                            $evaluacionpares->envio_archivo_options());
-    
-    $envio->attachment_filemanager = $draftitemid;
-    
-    $mform->set_data($envio);
+        $draftitemid = file_get_submitted_draft_itemid('attachment_filemanager');
+
+        file_prepare_draft_area($draftitemid, $modulecontext->id, 'mod_evaluacionpares', 'submission_attachment', $envio->id,
+                                $evaluacionpares->envio_archivo_options());
+
+        $envio->attachment_filemanager = $draftitemid;
+
+        $mform->set_data($envio);
+    }
 }
 
 $PAGE->set_url(new moodle_url('/mod/evaluacionpares/envio.php', array('id' => $cm->id)));
@@ -124,32 +110,20 @@ if($envio->id && !$edit){
         
     $fs = get_file_storage();
     $files = $fs->get_area_files($modulecontext->id, 'mod_evaluacionpares', 'submission_attachment', $envio->id);
-    foreach ($files as $file) {
-        $filepath   = $file->get_filepath();
-        $filename   = $file->get_filename();
-        $fileurl    = moodle_url::make_pluginfile_url($modulecontext->id, 'mod_evaluacionpares', 'submission_attachment',
-            $envio->id, $filepath, $filename, true);
-        $embedurl   = moodle_url::make_pluginfile_url($modulecontext->id, 'mod_evaluacionpares', 'submission_attachment',
-            $envio->id, $filepath, $filename, false);
-        $embedurl   = new moodle_url($embedurl, array('preview' => 'bigthumb'));
-        $type       = $file->get_mimetype();
-        
-        $linkhtml   = html_writer::link($fileurl, $image . substr($filepath, 1) . $filename);
-        $linktxt    = "$filename [$fileurl]";
-
-        $messagetext = file_rewrite_pluginfile_urls('/', 'pluginfile.php',
-            $modulecontext->id, 'mod_evaluacionpares', 'submission_attachment', $envio->id);
-        
-        var_dump($messagetext);
-    }
-        echo '<h3>Su envio:</h3>';
-        var_dump($linkhtml);
-        echo '<br>';
-        var_dump($linktxt);
-        $url = new moodle_url('/mod/evaluacionpares/envio.php', array('id' => $cm->id, 'env'=>$envio->id, 'edit'=>'1'));
-        echo '<a class="btn btn-primary" href="'. $url.'">Editar envio</a>';
-
-        echo '<br>';
+    
+    $file = end($files);
+    
+    $data = $evaluacionpares->get_archivos_by_content_hash($file->get_contenthash(), $USER->id);
+    echo '<h3>Su envio:</h3>';
+    
+    $data = current($data);
+    $archivoUrl = new moodle_url("/draftfile.php/$data->contextid/user/draft/$data->itemid/$data->filename");
+    
+    echo '<a class="btn btn-secondary" href="'. $archivoUrl.'">archivo</a>';
+    echo '<br>';
+    
+    $url = new moodle_url('/mod/evaluacionpares/envio.php', array('id' => $cm->id, 'env'=>$envio->id, 'edit'=>'1'));
+    echo '<a class="btn btn-primary" href="'. $url.'">Editar envio</a>';
 
 
 }else{
