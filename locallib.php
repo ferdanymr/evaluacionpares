@@ -119,7 +119,7 @@ class evaluacionpares{
 
     public function get_archivos_by_content_hash($hash, $userid){
         global $DB;
-        return $DB->get_records_sql("SELECT * FROM {files} WHERE contenthash = '$hash' AND userid = $userid ORDER BY id DESC LIMIT 1;");
+        return $DB->get_records_sql("SELECT * FROM {files} WHERE contenthash = '$hash' AND userid = $userid ORDER BY id DESC;");
     }
 
     /**

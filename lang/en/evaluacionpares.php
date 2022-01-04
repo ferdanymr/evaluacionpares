@@ -63,4 +63,10 @@ $string['contenidoenvio']        = 'Contenido del envío';
 $string['num_max_arch']          = 'Número máximo de archivos adjuntos por envío';
 $string['adjunto']               = 'Adjunto';
 $string['coment']                = 'Comentario';
+$string['noenvio']               = 'No se ha registrado ningun archivo';
+$string['addenvio']              = 'Añadir envio';
+$string['setenvio']              = 'Editar envio';
+$string['setcriterios']          = 'Modificar criterios';
+$string['successenvio']          = 'a sido registado con exito';
+$string['verenvio']              = 'Ver envio';
 

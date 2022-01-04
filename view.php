@@ -118,7 +118,7 @@ if($moduleinstance->fase == 0){
 }else{
     if(!$envio->id){
         $data = $evaluacionpares->get_envio_by_userId($USER->id);
-        $envio = $data[1];
+        $envio = end($data);
         if (empty($envio->id)) {
             $envio = new stdClass;
             $envio->id = null;
@@ -148,15 +148,43 @@ if($moduleinstance->fase == 0){
     echo '</div>';
     print_collapsible_region_end();
     
+    print_collapsible_region_start('','envio',get_string('envio','mod_evaluacionpares'));
+
     if($envio->id){
+        $fs         = get_file_storage();
+        $files      = $fs->get_area_files($modulecontext->id, 'mod_evaluacionpares', 'submission_attachment', $envio->id);
+        $file       = end($files);
+        $data       = $evaluacionpares->get_archivos_by_content_hash($file->get_contenthash(), $USER->id);        
+        $data       = current($data);
+        $archivoUrl = new moodle_url("/draftfile.php/$data->contextid/user/draft/$data->itemid/$data->filename");
+
+        echo '<div class="row">';
+        echo '	<div class="col-12">';
+        echo '      <br>';
+        echo '      <p>'.$data->filename .' '. get_string('successenvio','mod_evaluacionpares').'</p>';
+        echo '	</div>';
+        echo '</div>';
+        print_collapsible_region_end();
+        echo '<br>';
         $url = new moodle_url('/mod/evaluacionpares/envio.php', array('id' => $cm->id, 'env' => $envio->id));
-        echo '<a class="btn btn-primary" href="'. $url.'">Editar Envio</a>';
+        echo '<a class="btn btn-primary" href="'. $url.'">'. get_string('verenvio','mod_evaluacionpares').'</a>';
+
     }else{
+
+        echo '<div class="row">';
+        echo '	<div class="col-12">';
+        echo '      <p>'.get_string('noenvio','mod_evaluacionpares').'</p>';
+        echo '	</div>';
+        echo '</div>';
+        print_collapsible_region_end();
+        echo '<br>';
         $url = new moodle_url('/mod/evaluacionpares/envio.php', array('id' => $cm->id));
-        echo '<a class="btn btn-primary" href="'. $url.'">Añadir envio</a>';
+        echo '<a class="btn btn-primary" href="'. $url.'">'.get_string('addenvio','mod_evaluacionpares').'</a>';
+
     }
+
     $url = new moodle_url('/mod/evaluacionpares/aspectos.php', array('cmid' => $cm->id));
-    echo '<a class="btn btn-primary" href="'. $url.'">modificar criterios</a>';
+    echo '<a class="btn btn-primary" href="'. $url.'">'.get_string('setcriterios','mod_evaluacionpares').'</a>';
 }
 
 echo $OUTPUT->footer();

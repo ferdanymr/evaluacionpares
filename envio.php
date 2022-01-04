@@ -53,36 +53,46 @@ $modulecontext = context_module::instance($cm->id);
 $evaluacionpares =  new evaluacionpares($moduleinstance, $cm, $course);
 
 if(!$envio->id || $edit){
-    $mform = new envio_form(new moodle_url('/mod/evaluacionpares/envio.php', 
-        array('id' => $id)), array('attachmentopts' => $evaluacionpares->envio_archivo_options()));
+    if(!$envio->id){
+        $mform = new envio_form(new moodle_url('/mod/evaluacionpares/envio.php', 
+            array('id' => $id)), array('attachmentopts' => $evaluacionpares->envio_archivo_options())); 
+    }else{
+        $mform = new envio_form(new moodle_url('/mod/evaluacionpares/envio.php', 
+            array('id' => $id, 'env' => $envio->id, 'edit' => '1')), array('attachmentopts' => $evaluacionpares->envio_archivo_options())); 
+    }
 
     if ($mform->is_cancelled()) {
 
-        redirect(new moodle_url('/mod/evaluacionpares/view.php', array('id' => $cm->id)));
-
-    }else if ($envio = $mform->get_data()) {
-        $envio->envios = '1';
-        $envio->calificacion = '0';
-        $envio->no_calificaciones = '0';
-        $envio->evaluacionpares_id = $evaluacionpares->id;
-        $envio->autor_id = $USER->id;
-
-        $envio->id = $DB->insert_record('entrega', $envio);
-
-        file_save_draft_area_files($envio->attachment_filemanager, $modulecontext->id, 'mod_evaluacionpares', 'submission_attachment',
-            $envio->id, $evaluacionpares->envio_archivo_options());
-
         redirect(new moodle_url('/mod/evaluacionpares/view.php', array('id' => $cm->id, 'env' => $envio->id)));
 
-    }else {
-
+    }else if ($data = $mform->get_data()) {
+        $data->envios = '1';
+        $data->calificacion = '0';
+        $data->no_calificaciones = '0';
+        $data->evaluacionpares_id = $evaluacionpares->id;
+        $data->autor_id = $USER->id;
+        
         if(!$envio->id){
-            $data = $evaluacionpares->get_envio_by_userId($USER->id);
-            $envio = $data[1];
-            if (empty($envio->id)) {
-                $envio = new stdClass;
-                $envio->id = null;
-            }
+            
+            $data->id = $DB->insert_record('entrega', $data);
+
+        }else{
+            $data->id = $envio->id;
+            $DB->update_record('entrega', $data);
+
+        }
+
+        file_save_draft_area_files($data->attachment_filemanager, $modulecontext->id, 'mod_evaluacionpares', 'submission_attachment',
+            $data->id, $evaluacionpares->envio_archivo_options());
+
+        redirect(new moodle_url('/mod/evaluacionpares/view.php', array('id' => $cm->id, 'env' => $data->id)));
+
+    }else {
+        $data = $evaluacionpares->get_envio_by_userId($USER->id);
+        $envio = end($data);
+        if (empty($envio->id)) {
+            $envio = new stdClass;
+            $envio->id = null;
         }
 
         $draftitemid = file_get_submitted_draft_itemid('attachment_filemanager');
@@ -106,8 +116,7 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($course->name));
 
 if($envio->id && !$edit){
-    $out = array();
-        
+
     $fs = get_file_storage();
     $files = $fs->get_area_files($modulecontext->id, 'mod_evaluacionpares', 'submission_attachment', $envio->id);
     
@@ -116,14 +125,15 @@ if($envio->id && !$edit){
     $data = $evaluacionpares->get_archivos_by_content_hash($file->get_contenthash(), $USER->id);
     echo '<h3>Su envio:</h3>';
     
-    $data = current($data);
+    $data = end($data);
     $archivoUrl = new moodle_url("/draftfile.php/$data->contextid/user/draft/$data->itemid/$data->filename");
     
-    echo '<a class="btn btn-secondary" href="'. $archivoUrl.'">archivo</a>';
+    echo '<a class="btn btn-secondary" href="'. $archivoUrl.'">'.$data->filename.'</a>';
+    echo '<br>';
     echo '<br>';
     
     $url = new moodle_url('/mod/evaluacionpares/envio.php', array('id' => $cm->id, 'env'=>$envio->id, 'edit'=>'1'));
-    echo '<a class="btn btn-primary" href="'. $url.'">Editar envio</a>';
+    echo '<a class="btn btn-primary" href="'. $url.'">'.get_string('setenvio','mod_evaluacionpares').'</a>';
 
 
 }else{
