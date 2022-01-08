@@ -33,6 +33,7 @@ global $DB,$USER;
 $id = optional_param('id', 0, PARAM_INT);
 $envio->id = optional_param('env', 0, PARAM_INT);
 $edit = optional_param('edit', 0, PARAM_INT);
+$delete = optional_param('delete', 0, PARAM_INT);
 
 $e  = optional_param('e', 0, PARAM_INT);
 
@@ -52,7 +53,18 @@ $modulecontext = context_module::instance($cm->id);
 
 $evaluacionpares =  new evaluacionpares($moduleinstance, $cm, $course);
 
-if(!$envio->id || $edit){
+if($delete){
+
+    $envio->id = $delete;
+
+    $fs = get_file_storage();
+    $fs->delete_area_files($modulecontext->id, 'mod_evaluacionpares', 'submission_attachment', $envio->id);
+    
+    $DB->delete_records('entrega', array('id' => $envio->id));
+
+    redirect(new moodle_url('/mod/evaluacionpares/view.php', array('id' => $cm->id)),"Envio eliminado con exito");
+
+} else if(!$envio->id || $edit){
     if(!$envio->id){
         $mform = new envio_form(new moodle_url('/mod/evaluacionpares/envio.php', 
             array('id' => $id)), array('attachmentopts' => $evaluacionpares->envio_archivo_options())); 
@@ -133,8 +145,10 @@ if($envio->id && !$edit){
     echo '<br>';
     
     $url = new moodle_url('/mod/evaluacionpares/envio.php', array('id' => $cm->id, 'env'=>$envio->id, 'edit'=>'1'));
-    echo '<a class="btn btn-primary" href="'. $url.'">'.get_string('setenvio','mod_evaluacionpares').'</a>';
+    $urlDelete = new moodle_url('/mod/evaluacionpares/envio.php', array('id' => $cm->id, 'delete' => $envio->id));
 
+    echo '<a class="btn btn-primary" href="'. $url .'">'.get_string('setenvio','mod_evaluacionpares').'</a>';
+    echo '<a class="btn btn-primary" href="'. $urlDelete .'">'.get_string('deletenvio','mod_evaluacionpares').'</a>';
 
 }else{
     require_once('localview/main_form.php');

@@ -69,4 +69,5 @@ $string['setenvio']              = 'Editar envio';
 $string['setcriterios']          = 'Modificar criterios';
 $string['successenvio']          = 'a sido registado con exito';
 $string['verenvio']              = 'Ver envio';
+$string['deletenvio']            = 'Eliminar envio';
 
