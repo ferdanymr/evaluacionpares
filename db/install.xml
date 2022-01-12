@@ -40,7 +40,9 @@
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="titulo" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="titulo del archivo entregado"/>
+                <FIELD NAME="comentario" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="El comentario anexo al envio"/>
                 <FIELD NAME="envios" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="numero de archivos"/>
+                <FIELD NAME="envio_listo" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="indica si su envio esta listo para la siguiente fase"/>
                 <FIELD NAME="calificacion" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="Calificacion total de la entrega"/>        
                 <FIELD NAME="no_calificaciones" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Numero de calificaciones recibidas"/>        
                 <FIELD NAME="evaluacionpares_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Llave foranea referente al evaluacionpares"/>        

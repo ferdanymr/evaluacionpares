@@ -26,6 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_evaluacionpares';
 $plugin->release = '0.1.0';
-$plugin->version = 2020110815;
+$plugin->version = 2020110801;
 $plugin->requires = 2019052000;
 $plugin->maturity = MATURITY_ALPHA;

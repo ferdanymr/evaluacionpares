@@ -26,13 +26,16 @@ require(__DIR__.'/../../config.php');
 require_once('locallib.php');
 require_once('localview/aspectos_form.php');
 
-// Course_module ID, or
+// Id del curso
 $id = optional_param('id', 0, PARAM_INT);
+
+//Si hay un envio aqui capturaremos su id
 $envio->id = optional_param('env', 0, PARAM_INT);
 
 // ... module instance id.
 $e  = optional_param('e', 0, PARAM_INT);
 
+//contador del numero de aspectos
 $noAspectos = optional_param('no', 0, PARAM_INT);
 
 if ($id) {
@@ -52,10 +55,12 @@ $modulecontext = context_module::instance($cm->id);
 $evaluacionpares =  new evaluacionpares($moduleinstance, $cm, $course);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-//bloque para configurar la vista de criterios en dado caso de que la fase dea 0               //
+//bloque para configurar la vista de criterios en dado caso de que la fase sea 0               //
 /////////////////////////////////////////////////////////////////////////////////////////////////
-if($moduleinstance->fase == 0){
+if($evaluacionpares->fase == 0){
 
+    //validamos si por get se mando el numero de aspectos al cual le agregaremos 2 más
+    //si no se tienen se asignaran por defecto 2
     if($noAspectos){
 
         $noAspectos += 2; 
@@ -66,6 +71,9 @@ if($moduleinstance->fase == 0){
     
     }
 
+    //se define el formulario con la url a la que mandara los datos a la hora de hacer submit
+    //los parametros enviados son el id del curso y el numero de aspectos actual
+    // al formulario por aparte le mandamos tambien el numero de aspectos
     $mform = new aspectos_form(new moodle_url('/mod/evaluacionpares/view.php', array('id' => $cm->id,'no' => $noAspectos)), $noAspectos);
 
     if ($mform->is_cancelled()) {
@@ -73,7 +81,7 @@ if($moduleinstance->fase == 0){
         redirect(new moodle_url('/course/view.php', array('id'=>$course->id)));
 
     }else if ($fromform = $mform->get_data()) {
-        
+        //si se hace submit se preparan los datos para insertarlos en la Base de Datos        
         $criterio       = new stdClass();
         $opcionCriterio = new stdClass();
     
@@ -114,8 +122,12 @@ if($moduleinstance->fase == 0){
         redirect(new moodle_url('/mod/evaluacionpares/view.php', array('id' => $cm->id)));
     
     }
-    
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//bloque para configurar la vista de criterios en dado caso de que la fase sea 1               //
+/////////////////////////////////////////////////////////////////////////////////////////////////
 }else{
+    //primero verificamos si el usuario ya hizo un envio o no para modificar la vista de acuerdo a su envio
     if(!$envio->id){
         $data = $evaluacionpares->get_envio_by_userId($USER->id);
         $envio = end($data);
@@ -126,8 +138,9 @@ if($moduleinstance->fase == 0){
     }
 }
 
+//seteamos la url de la pagina
 $PAGE->set_url(new moodle_url('/mod/evaluacionpares/view.php', array('id' => $cm->id)));
-
+//seteamos el titulo de la pagina
 $PAGE->set_title(get_string('pluginname', 'mod_evaluacionpares'));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
@@ -135,11 +148,13 @@ $PAGE->set_context($modulecontext);
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($course->name));
 
-if($moduleinstance->fase == 0){ 
+//Si la fase es 0 siginifa configuracion entonces mostramos el formulario
+if($evaluacionpares->fase == 0){ 
     
     $mform->display();
 
 }else{
+//si  no configuramos la vista para mostrar los envios
     print_collapsible_region_start('','instrucciones-envio',get_string('param_inst','mod_evaluacionpares'));
     echo '<div class="row">';
     echo '	<div class="col-12">';
@@ -150,39 +165,55 @@ if($moduleinstance->fase == 0){
     
     print_collapsible_region_start('','envio',get_string('envio','mod_evaluacionpares'));
 
+    //verificamos si el alumno ya tienen un envio o aun no
     if($envio->id){
+        //traemos los envios hechos
         $fs         = get_file_storage();
+        //seleccionamos los de area evaluacionpares y el id del envio
         $files      = $fs->get_area_files($modulecontext->id, 'mod_evaluacionpares', 'submission_attachment', $envio->id);
+        //traemos el ultimo registro
         $file       = end($files);
-        $data       = $evaluacionpares->get_archivos_by_content_hash($file->get_contenthash(), $USER->id);        
-        $data       = current($data);
-        $archivoUrl = new moodle_url("/draftfile.php/$data->contextid/user/draft/$data->itemid/$data->filename");
-
+        //traemos el nombre y un mensaje de que su envio ha sido registrado con exito
         echo '<div class="row">';
         echo '	<div class="col-12">';
         echo '      <br>';
-        echo '      <p>'.$data->filename .' '. get_string('successenvio','mod_evaluacionpares').'</p>';
+        echo '      <p>'. $file->get_filename() .' '. get_string('successenvio','mod_evaluacionpares').'</p>';
         echo '	</div>';
         echo '</div>';
-        print_collapsible_region_end();
-        echo '<br>';
+        //mostramos un boton para que el usuario pueda ver su envio
         $url = new moodle_url('/mod/evaluacionpares/envio.php', array('id' => $cm->id, 'env' => $envio->id));
         echo '<a class="btn btn-primary" href="'. $url.'">'. get_string('verenvio','mod_evaluacionpares').'</a>';
+        print_collapsible_region_end();
+        echo '<br>';
+
+        print_collapsible_region_start('','calificar','Calificar otros envios');
+        echo '<div class="row">';
+        echo '	<div class="col-12">';
+        echo '      <br>';
+        echo '      <p>Una vez realizado el envio, puedes proceder a evaluar a tus compañeros</p>';
+        echo '	</div>';
+        echo '</div>';
+
+        $url = new moodle_url('/mod/evaluacionpares/envio.php', array('id' => $cm->id, 'env' => $envio->id));
+        echo '<a class="btn btn-primary" href="'. $url.'">'. 'Evaluar trabajos' .'</a>';
+        print_collapsible_region_end();
 
     }else{
-
+        
+        //si no tiene envio configuramos la vista para desplegar un mensaje de que aun no tiene ningun envio
         echo '<div class="row">';
         echo '	<div class="col-12">';
         echo '      <p>'.get_string('noenvio','mod_evaluacionpares').'</p>';
         echo '	</div>';
         echo '</div>';
-        print_collapsible_region_end();
-        echo '<br>';
+        //mostramos un boton para que pueda añadir su envio
         $url = new moodle_url('/mod/evaluacionpares/envio.php', array('id' => $cm->id));
         echo '<a class="btn btn-primary" href="'. $url.'">'.get_string('addenvio','mod_evaluacionpares').'</a>';
+        print_collapsible_region_end();
 
     }
-
+    
+    echo '<br>';
     $url = new moodle_url('/mod/evaluacionpares/aspectos.php', array('cmid' => $cm->id));
     echo '<a class="btn btn-primary" href="'. $url.'">'.get_string('setcriterios','mod_evaluacionpares').'</a>';
 }
