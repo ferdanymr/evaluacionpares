@@ -81,10 +81,10 @@
             </KEYS>
         </TABLE>
 
-        <TABLE NAME="calificacion_usuario" COMMENT="Stores the evaluacionpares activity module instances.">
+        <TABLE NAME="evaluacion_usuario" COMMENT="Stores the evaluacionpares activity module instances.">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-                <FIELD NAME="calificacion" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="5" COMMENT="The format of the intro field."/>
+                <FIELD NAME="is_evaluado" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="5" COMMENT="campo para saber si el trabajo ya ha sido evaluado"/>
                 <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="estatus de la calificacion para ver si se toma en cuenta o no"/>        
                 <FIELD NAME="edit_user_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="si un profesor altera la calificacion aquí se mostrara"/>
                 <FIELD NAME="entrega_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente a la entrega"/>
@@ -101,12 +101,12 @@
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="opcion_criterio_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente a opciones criterio"/>
-                <FIELD NAME="calificacion_usuario_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente al calificacion usuario"/>
+                <FIELD NAME="evaluacion_usuario_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente al calificacion usuario"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
                 <KEY NAME="fk_opciones" TYPE="foreign" FIELDS="opcion_criterio_id" REFTABLE="opcion_criterio" REFFIELDS="id"/>
-                <KEY NAME="fk_calificaciones" TYPE="foreign" FIELDS="calificacion_usuario_id" REFTABLE="calificacion_usuario" REFFIELDS="id"/>
+                <KEY NAME="fk_calificaciones" TYPE="foreign" FIELDS="evaluacion_usuario_id" REFTABLE="evaluacion_usuario" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
 
