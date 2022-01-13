@@ -78,17 +78,19 @@ if($delete){
         redirect(new moodle_url('/mod/evaluacionpares/view.php', array('id' => $cm->id, 'env' => $envio->id)));
 
     }else if ($data = $mform->get_data()) {
-        $data->envios = '1';
-        $data->calificacion = '0';
-        $data->no_calificaciones = '0';
+        $data->envios             = '1';
+        $data->envio_listo        = '0';
+        $data->calificacion       = '0';
+        $data->no_calificaciones  = '0';
         $data->evaluacionpares_id = $evaluacionpares->id;
-        $data->autor_id = $USER->id;
+        $data->autor_id           = $USER->id;
         
         if(!$envio->id){
-            
+
             $data->id = $DB->insert_record('entrega', $data);
 
         }else{
+            
             $data->id = $envio->id;
             $DB->update_record('entrega', $data);
 
