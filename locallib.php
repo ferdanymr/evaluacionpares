@@ -122,6 +122,11 @@ class evaluacionpares{
         return $DB->get_records_sql("SELECT * FROM {files} WHERE contenthash = '$hash' AND userid = $userid ORDER BY id DESC;");
     }
 
+    public function get_evaluaciones_by_userId($userId){
+        global $DB;
+        return $DB->get_records_sql("SELECT * FROM {evaluacion_usuario} WHERE evaluacionpares_id = $this->id AND autor_id = $userId;");
+    }
+
     /**
      * Return the editor options for the submission content field.
      *

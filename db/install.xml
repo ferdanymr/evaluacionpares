@@ -88,12 +88,14 @@
                 <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="estatus de la calificacion para ver si se toma en cuenta o no"/>        
                 <FIELD NAME="edit_user_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="si un profesor altera la calificacion aquí se mostrara"/>
                 <FIELD NAME="entrega_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente a la entrega"/>
-                <FIELD NAME="user_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente al usuario"/>
+                <FIELD NAME="evaluador_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente al usuario"/>
+                <FIELD NAME="evaluacionpares_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Llave foranea referente al evaluacionpares"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-                <KEY NAME="fk_user" TYPE="foreign" FIELDS="user_id" REFTABLE="user" REFFIELDS="id"/>
+                <KEY NAME="fk_user" TYPE="foreign" FIELDS="evaluador_id" REFTABLE="user" REFFIELDS="id"/>
                 <KEY NAME="fk_entrega" TYPE="foreign" FIELDS="entrega_id" REFTABLE="entrega" REFFIELDS="id"/>
+                <KEY NAME="fk_evaluacionpares" TYPE="foreign" FIELDS="evaluacionpares_id" REFTABLE="evaluacionpares" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
 
