@@ -193,7 +193,7 @@ if($evaluacionpares->fase == 0){
             //traemos los envios hechos
             $fs         = get_file_storage();
             //seleccionamos los de area evaluacionpares y el id del envio
-            $files      = $fs->get_area_files($modulecontext->id, 'mod_evaluacionpares', 'submission_attachment', $envio->id);
+            $files      = $fs->get_area_files($modulecontext->id, 'mod_evaluacionpares', 'envio_filemanager', $envio->id);
             //traemos el ultimo registro
             $file       = end($files);
             //traemos el nombre y un mensaje de que su envio ha sido registrado con exito
@@ -238,19 +238,53 @@ if($evaluacionpares->fase == 0){
 
     }else if($envio->envio_listo == 1){
         
+        $evaluacionesUser    = $evaluacionpares->get_evaluaciones_completas_by_userId($USER->id);
+        $noEvaluaciones      = count($evaluacionesUser);
+        $evaluacionPendiente = $evaluacionpares->get_evaluacion_pendiente_by_userId($USER->id);
+        $evaluacionPendiente = current($evaluacionPendiente);
+        $envio               = $evaluacionpares->get_envio_by_userId($USER->id);
+        $envio               = end($envio);
+
         //si  no configuramos la vista para mostrar las instrucciones de evaluacion
         print_collapsible_region_start('','instrucciones-evaluacion','Instrucciones evaluacion');
         echo '<div class="row">';
         echo '	<div class="col-12">';
-        echo "      <p>$moduleinstance->instruccion_valoracion</p>";
+        echo "      <p>$evaluacionpares->instruccion_valoracion</p>";
         echo '	</div>';
         echo '</div>';
         print_collapsible_region_end();
 
-        print_collapsible_region_start('','evaluaciones','Evaluaciones');
+        print_collapsible_region_start('','evaluaciones-hechas','Evaluaciones realizadas');
         echo '<div class="row">';
         echo '	<div class="col-12">';
-        echo "      <p>Trabajos evaluados: </p>";
+        echo "      <p>Trabajos evaluados: $noEvaluaciones de $evaluacionpares->no_revisiones</p>";
+        echo '	</div>';
+        echo '</div>';
+        
+        if($evaluacionPendiente){
+
+            $url = new moodle_url('/mod/evaluacionpares/evaluaciones.php', array('id' => $cm->id, 'trabajo' => $evaluacionPendiente->entrega_id));
+
+        }else{
+
+            $url = new moodle_url('/mod/evaluacionpares/evaluaciones.php', array('id' => $cm->id));
+
+        }
+        
+        echo '<a class="btn btn-primary" href="'. $url.'">'. 'Evaluar trabajo' .'</a>';
+        print_collapsible_region_end();
+        echo  '<br>';
+
+        print_collapsible_region_start('','calificacion-obtenidas','Calificacion');
+        echo '<div class="row">';
+        echo '	<div class="col-12">';
+        if($envio->no_calificaciones == $evaluacionpares->no_revisiones && $noEvaluaciones == $evaluacionpares->no_revisiones){
+            echo "      <p>Su calificacion final es:</p>";
+            echo "      <p>$envio->calificacion</p>";
+        }else{
+            echo "      <p>Cuando obtenga y realice el numero de evaluaciones que se requiere se le mostrara su calificacion</p>";
+            echo "      <p>Evaluaciones recibidas $envio->no_calificaciones de $evaluacionpares->no_revisiones</p>";
+        }
         echo '	</div>';
         echo '</div>';
         print_collapsible_region_end();

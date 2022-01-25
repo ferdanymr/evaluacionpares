@@ -122,11 +122,25 @@ class evaluacionpares{
         return $DB->get_records_sql("SELECT * FROM {files} WHERE contenthash = '$hash' AND userid = $userid ORDER BY id DESC;");
     }
 
-    public function get_evaluaciones_by_userId($userId){
+    public function get_evaluaciones_completas_by_userId($userId){
         global $DB;
-        return $DB->get_records_sql("SELECT * FROM {evaluacion_usuario} WHERE evaluacionpares_id = $this->id AND autor_id = $userId;");
+        return $DB->get_records_sql("SELECT * FROM {evaluacion_usuario} WHERE evaluacionpares_id = $this->id AND evaluador_id = $userId AND is_evaluado = 1;");
     }
 
+    public function get_evaluacion_pendiente_by_userId($userId){
+        global $DB;
+        return $DB->get_records_sql("SELECT * FROM {evaluacion_usuario} WHERE evaluacionpares_id = $this->id AND evaluador_id = $userId AND is_evaluado = 0;");
+    }
+
+    public function get_envio_para_evaluar($userId){
+        global $DB;
+        return $DB->get_records_sql("SELECT * FROM {entrega} WHERE evaluacionpares_id = $this->id AND envio_listo = 1 AND autor_id != $userId ORDER BY no_calificaciones DESC LIMIT 1;");
+    }
+
+    public function get_envio_by_id($id){
+        global $DB;
+        return $DB->get_record_sql("SELECT * FROM {entrega} WHERE evaluacionpares_id = $this->id AND id = $id;");
+    }
     /**
      * Return the editor options for the submission content field.
      *

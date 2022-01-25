@@ -44,9 +44,9 @@ class envio_form extends moodleform {
 
         $mform->addElement('static', 'filemanagerinfo', get_string('num_max_arch', 'mod_evaluacionpares'), 1);
         
-        $mform->addElement('filemanager', 'attachment_filemanager', get_string('adjunto', 'evaluacionpares'),
+        $mform->addElement('filemanager', 'envio_filemanager', get_string('adjunto', 'evaluacionpares'),
                             null, $attachmentopts);
-        $mform->addRule('attachment_filemanager', null, 'required', null, 'client');
+        $mform->addRule('envio_filemanager', null, 'required', null, 'client');
         
         $this->add_action_buttons();
     }

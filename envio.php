@@ -58,7 +58,7 @@ if($delete){
     $envio->id = $delete;
 
     $fs = get_file_storage();
-    $fs->delete_area_files($modulecontext->id, 'mod_evaluacionpares', 'submission_attachment', $envio->id);
+    $fs->delete_area_files($modulecontext->id, 'mod_evaluacionpares', 'envio_filemanager', $envio->id);
     
     $DB->delete_records('entrega', array('id' => $envio->id));
 
@@ -96,7 +96,7 @@ if($delete){
 
         }
 
-        file_save_draft_area_files($data->attachment_filemanager, $modulecontext->id, 'mod_evaluacionpares', 'submission_attachment',
+        file_save_draft_area_files($data->envio_filemanager, $modulecontext->id, 'mod_evaluacionpares', 'envio_filemanager',
             $data->id, $evaluacionpares->envio_archivo_options());
 
         redirect(new moodle_url('/mod/evaluacionpares/view.php', array('id' => $cm->id, 'env' => $data->id)));
@@ -109,12 +109,12 @@ if($delete){
             $envio->id = null;
         }
 
-        $draftitemid = file_get_submitted_draft_itemid('attachment_filemanager');
+        $draftitemid = file_get_submitted_draft_itemid('envio_filemanager');
 
-        file_prepare_draft_area($draftitemid, $modulecontext->id, 'mod_evaluacionpares', 'submission_attachment', $envio->id,
+        file_prepare_draft_area($draftitemid, $modulecontext->id, 'mod_evaluacionpares', 'envio_filemanager', $envio->id,
                                 $evaluacionpares->envio_archivo_options());
 
-        $envio->attachment_filemanager = $draftitemid;
+        $envio->envio_filemanager = $draftitemid;
 
         $mform->set_data($envio);
     }
@@ -132,7 +132,7 @@ echo $OUTPUT->heading(format_string($course->name));
 if($envio->id && !$edit){
 
     $fs = get_file_storage();
-    $files = $fs->get_area_files($modulecontext->id, 'mod_evaluacionpares', 'submission_attachment', $envio->id);
+    $files = $fs->get_area_files($modulecontext->id, 'mod_evaluacionpares', 'envio_filemanager', $envio->id);
     
     $file = end($files);
     
