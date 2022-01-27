@@ -112,6 +112,12 @@ class evaluacionpares{
         }
     }
 
+    
+    public function url_vista() {
+        global $CFG;
+        return new moodle_url('/mod/evaluacionpares/view.php', array('id' => $this->cm->id));
+    }
+
     public function get_envio_by_userId($userId){
         global $DB;
         return $DB->get_records_sql("SELECT * FROM {entrega} WHERE evaluacionpares_id = $this->id AND autor_id = $userId;");
@@ -141,40 +147,53 @@ class evaluacionpares{
         global $DB;
         return $DB->get_record_sql("SELECT * FROM {entrega} WHERE evaluacionpares_id = $this->id AND id = $id;");
     }
+
+    public function edit_envio($data){
+        global $USER, $DB;
+
+        $data->envios             = '1';
+        $data->envio_listo        = '0';
+        $data->calificacion       = '0';
+        $data->no_calificaciones  = '0';
+        $data->evaluacionpares_id = $this->id;
+        $data->autor_id           = $USER->id;
+        
+        if(is_null($data->id)){
+
+            $data->id = $DB->insert_record('entrega', $data);
+
+        }
+        
+        $data = file_postupdate_standard_filemanager($data, 'attachment', $this->filemanager_options(),
+            $this->context, 'mod_evaluacionpares', 'submission_attachment', $data->id);
+        
+        if (empty($data->attachment)) {
+                // Explicit cast to zero integer.
+                $data->attachment = 0;
+                $data->envios     = '0';
+        }else{
+            $data->envios = $data->attachment;
+        }
+
+        $DB->update_record('entrega', $data);
+            
+    }
     /**
      * Return the editor options for the submission content field.
      *
      * @return array
      */
-    public function envio_content_options() {
+    public function filemanager_options() {
         global $CFG;
         require_once($CFG->dirroot.'/repository/lib.php');
 
         return array(
-            'trusttext' => true,
-            'subdirs' => false,
-            'maxfiles' => $this->no_archivos,
+            'subdirs' => 0,
             'maxbytes' => $this->tam_max,
-            'context' => $this->context,
-            //'return_types' => FILE_INTERNAL | FILE_EXTERNAL,
-        );
-    }
-
-    public function envio_archivo_options() {
-        global $CFG;
-        require_once($CFG->dirroot.'/repository/lib.php');
-
-        $options = array(
-            'subdirs' => true,
             'maxfiles' => $this->no_archivos,
-            'maxbytes' => $this->tam_max,
-            //'return_types' => FILE_INTERNAL | FILE_CONTROLLED_LINK,
+            'accepted_types'=> $this->tipo_arch,
+            'return_types' => FILE_INTERNAL | FILE_EXTERNAL,
         );
-
-        $filetypesutil = new \core_form\filetypes_util();
-        $options['accepted_types'] = $filetypesutil->normalize_file_types($this->tipo_arch);
-
-        return $options;
     }
 
     public function prepare_envio(stdClass $record, $showauthor = true) {

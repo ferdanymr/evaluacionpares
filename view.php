@@ -52,9 +52,7 @@ if ($id) {
 
 require_login($course, true, $cm);
 
-$modulecontext = context_module::instance($cm->id);
-
-$evaluacionpares =  new evaluacionpares($moduleinstance, $cm, $course);
+$evaluacionpares = new evaluacionpares($moduleinstance, $cm, $course);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //bloque para configurar la vista de criterios en dado caso de que la fase sea 0               //
@@ -141,11 +139,11 @@ if($evaluacionpares->fase == 0){
 }
 
 //seteamos la url de la pagina
-$PAGE->set_url(new moodle_url('/mod/evaluacionpares/view.php', array('id' => $cm->id)));
+$PAGE->set_url($evaluacionpares->url_vista());
 //seteamos el titulo de la pagina
 $PAGE->set_title(get_string('pluginname', 'mod_evaluacionpares'));
 $PAGE->set_heading(format_string($course->fullname));
-$PAGE->set_context($modulecontext);
+$PAGE->set_context($evaluacionpares->context);
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($course->name));
@@ -181,7 +179,7 @@ if($evaluacionpares->fase == 0){
         print_collapsible_region_start('','instrucciones-envio',get_string('param_inst','mod_evaluacionpares'));
         echo '<div class="row">';
         echo '	<div class="col-12">';
-        echo "      <p>$moduleinstance->instruccion_envio</p>";
+        echo "      <p>$evaluacionpares->instruccion_envio</p>";
         echo '	</div>';
         echo '</div>';
         print_collapsible_region_end();
@@ -193,7 +191,7 @@ if($evaluacionpares->fase == 0){
             //traemos los envios hechos
             $fs         = get_file_storage();
             //seleccionamos los de area evaluacionpares y el id del envio
-            $files      = $fs->get_area_files($modulecontext->id, 'mod_evaluacionpares', 'envio_filemanager', $envio->id);
+            $files      = $fs->get_area_files($evaluacionpares->context, 'mod_evaluacionpares', 'submission_attachment', $envio->id);
             //traemos el ultimo registro
             $file       = end($files);
             //traemos el nombre y un mensaje de que su envio ha sido registrado con exito

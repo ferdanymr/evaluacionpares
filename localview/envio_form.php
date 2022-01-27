@@ -31,6 +31,7 @@ class envio_form extends moodleform {
     //Add elements to form
     function definition() {
         $mform = $this->_form;
+        $current        = $this->_customdata['current'];
         $attachmentopts = $this->_customdata['attachmentopts'];
 
         $mform->addElement('header', 'general', get_string('envio', 'mod_evaluacionpares'));
@@ -44,11 +45,14 @@ class envio_form extends moodleform {
 
         $mform->addElement('static', 'filemanagerinfo', get_string('num_max_arch', 'mod_evaluacionpares'), 1);
         
-        $mform->addElement('filemanager', 'envio_filemanager', get_string('adjunto', 'evaluacionpares'),
-                            null, $attachmentopts);
-        $mform->addRule('envio_filemanager', null, 'required', null, 'client');
+        $mform->addElement('filemanager', 'attachment_filemanager', get_string('adjunto', 'evaluacionpares'),
+                                null, $attachmentopts);
+
+        $mform->addRule('attachment_filemanager', null, 'required', null, 'client');
         
         $this->add_action_buttons();
+
+        $this->set_data($current);
     }
 
     

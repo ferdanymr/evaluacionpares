@@ -102,7 +102,7 @@ if(count($envio) == 0){
     print_collapsible_region_end();
 
     $fs = get_file_storage();
-    $files = $fs->get_area_files($modulecontext->id, 'mod_evaluacionpares', 'envio_filemanager', $envio->id);
+    $files = $fs->get_area_files($modulecontext->id, 'mod_evaluacionpares', 'attachments', $envio->id);
 
     $file = end($files);
 
